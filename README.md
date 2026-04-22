@@ -1,51 +1,85 @@
-# 🎬 CineGraph AI — Global Cinema Intelligence
+# 🎬 CineGraph AI — Global Cinema Intelligence Agent
 
-CineGraph AI is a sophisticated Knowledge Graph agent built for the **Neo4j Aura Agent Hackathon**. It transforms a dataset of 100,000 movies (1950–2026) into a reasoning engine that answers complex, multi-hop questions about the film industry.
+CineGraph AI transforms a massive dataset of 100,000 movies (1950–2026) into a high-performance Knowledge Graph. It allows users to perform deep, multi-hop reasoning over the global film industry, uncovering patterns in career trajectories, financial ROI, and genre evolution.
 
-## 🚀 Features
+Submitted to the **Neo4j Aura Agent Hackathon 2026**.
 
-- **Graph-Powered Reasoning**: Uses multi-hop traversals to answer "why" and "how" questions, not just "what".
-- **Intelligent Tools**: 6 custom Cypher Template tools for career analysis, collaboration networks, and trend forecasting.
-- **Aura Agent Integration**: Fully configured for the Neo4j Aura Agent console.
-- **Live Streamlit Dashboard**: A custom web interface for exploring the graph data visually.
+## 💡 The Idea
 
-## 📊 Knowledge Graph Schema
+Movie data is typically stored in flat tables (CSV/SQL), where you can see a movie's rating or budget. However, cinema is inherently **relational**. To answer "Why did this director succeed in Sci-Fi but fail in Drama?" or "What actor pairings consistently drive high ROI?", you need to traverse multiple hops through Directors, Actors, Genres, and Financials.
 
-The graph models the following entities and relationships:
-- **Nodes**: `Movie`, `Director`, `Actor`, `Genre`, `Country`, `Language`, `Decade`, `StreamingPlatform`.
-- **Relationships**: `DIRECTED`, `ACTED_IN`, `IN_GENRE`, `PRODUCED_IN`, `RELEASED_IN`, `AVAILABLE_ON`.
+CineGraph AI uses Neo4j Aura to map these connections, enabling an AI Agent to "reason" through the graph neighborhood rather than just performing simple keyword searches.
 
-## 🛠️ Setup & Installation
+## 🧠 Why a Graph?
 
-1. **Clone the repository**:
-   ```bash
-   git clone <your-repo-url>
-   cd neo4j
-   ```
+A flat database tells you Christopher Nolan directed *Inception*. A graph tells you that *Inception* (Sci-Fi) released in the *2010s* (Decade) in the *USA* (Country) and achieved a *high ROI*, and then correlates this with every other Sci-Fi film in that decade to determine if Nolan was a trend-setter or a trend-follower.
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```cypher
+// A typical multi-hop reasoning path
+MATCH (d:Director {name: 'Christopher Nolan'})-[:DIRECTED]->(m:Movie)-[:IN_GENRE]->(g:Genre)
+MATCH (m)-[:RELEASED_IN]->(dec:Decade)
+RETURN g.name, dec.name, avg(m.roi_pct) as avg_roi
+ORDER BY avg_roi DESC
+```
 
-3. **Configure Environment Variables**:
-   Create a `.env` file based on `.env.example` and add your Neo4j Aura credentials.
+## 🏗️ Architecture
 
-4. **Run the Streamlit App**:
-   ```bash
-   streamlit run app.py
-   ```
+```text
+┌─────────────────┐      ┌──────────────────┐      ┌──────────────────────────┐
+│  Global Movies  │      │   Python ETL     │      │   Neo4j Aura Database    │
+│  (100K Rows)    │─────>│  (import_movies) │─────>│   (Knowledge Graph)      │
+└─────────────────┘      └──────────────────┘      └────────────┬─────────────┘
+                                                                │
+                                                                ▼
+┌─────────────────┐      ┌──────────────────┐      ┌──────────────────────────┐
+│   User Query    │<────>│   Aura Agent     │<────>│   6 Cypher Graph Tools   │
+│ (Natural Lang)  │      │ (CineGraph AI)   │      │ (Career, Trends, ROI...) │
+└─────────────────┘      └──────────────────┘      └──────────────────────────┘
+```
 
 ## 📂 Project Structure
 
-- `app.py`: Streamlit web application.
-- `import_movies.py`: Data ingestion script for Neo4j Aura.
-- `AGENT_CONFIG.md`: Complete guide for setting up the Aura Agent.
-- `global_movies_dataset_1950_2026.csv`: The core dataset (100k rows).
+```text
+C:.
+│   .env                # Local credentials (ignored by git)
+│   .gitignore          # Git exclusion rules
+│   AGENT_CONFIG.md     # Full guide for Aura Agent setup
+│   app.py              # Streamlit Dashboard (Visual Explorer)
+│   import_movies.py    # Python pipeline for data ingestion
+│   README.md           # Project documentation
+│   requirements.txt    # Python dependencies
+│   agent_chat_demo.png # Screenshot of agent reasoning
+```
 
-## 🏆 Hackathon Submission
+## 🛠️ Intelligent Tools (Aura Agent)
 
-This project is submitted to the **Neo4j Aura Agent Hackathon**. It demonstrates the power of combining LLMs with structured Knowledge Graphs at scale.
+The agent is equipped with 6 custom Cypher Template tools for advanced analysis:
+1. **Director Career Analysis**: Complete filmography, revenue tracking, and award wins.
+2. **Actor Collaboration Network**: Multi-hop discovery of frequent partnerships and their performance.
+3. **Genre Trend by Decade**: Historical performance of genres from 1950s to 2020s.
+4. **Director-Genre-Country Deep Dive**: Geographic and stylistic focus analysis.
+5. **Blockbuster Formula Finder**: Pattern recognition for high-revenue hits.
+6. **Platform Showdown**: Content strategy analysis for Netflix, Disney+, etc.
+
+## 📸 Agent in Action
+
+![CineGraph AI Reasoning](agent_chat_demo.png)
+
+## 🚀 Quick Start
+
+1. **Clone & Install**:
+   ```bash
+   git clone https://github.com/Kumar3421/CineGraph-AI.git
+   cd CineGraph-AI
+   pip install -r requirements.txt
+   ```
+2. **Ingest Data**:
+   Configure `.env` with your Aura credentials and run:
+   ```bash
+   python import_movies.py
+   ```
+3. **Configure Agent**:
+   Follow the steps in [AGENT_CONFIG.md](AGENT_CONFIG.md) to create your Aura Agent.
 
 ---
-Built with ❤️ for the Neo4j Community.
+Built for the **Neo4j Aura Agent Hackathon 2026**.
